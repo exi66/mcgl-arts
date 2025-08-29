@@ -11,7 +11,7 @@ function App() {
   return (
     <>
       <PhotoProvider>
-        <div className="grid grid-cols-6 grid-flow-row gap-3 p-4">
+        <div className="grid grid-cols-3 md:grid-cols-6 grid-flow-row gap-3 p-4 max-w-6xl mx-auto">
           {gallery.map((item, index) => (
             <PhotoView key={index} src={item}>
               <div
