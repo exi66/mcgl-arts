@@ -1,6 +1,10 @@
+@import "tailwindcss";
+
+@tailwind utilities;
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  line-height: 0;
   font-weight: 400;
 
   color-scheme: light dark;
@@ -13,7 +17,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  margin: 0;
-  padding: 1rem;
+img.PhotoView__Photo {
+  image-rendering: pixelated;
+  @apply bg-white/10;
 }

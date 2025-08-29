@@ -1,4 +1,4 @@
-import Packery from "packery";
+import { PhotoProvider, PhotoView } from "react-photo-view";
 
 function App() {
   const gallery = Object.values(
@@ -8,39 +8,25 @@ function App() {
     })
   );
 
-  function initPackery() {
-    const packeryObject = new Packery("#gallery", {
-      itemSelector: "li",
-      gutter: 0,
-    });
-    packeryObject.layout();
-  }
-
-  const onLoad = (index) => {
-    if (index === gallery.length - 1) {
-      setTimeout(() => {
-        initPackery();
-      }, 100);
-    }
-  };
-
   return (
     <>
-      <ul id="gallery" style={{ padding: 0, overflowX: "hidden" }}>
-        {gallery &&
-          gallery.map((image, index) => {
-            return (
-              <li key={index} style={{ listStyle: "none", lineHeight: 0 }}>
-                <img
-                  src={image}
-                  alt={`image №${index}`}
-                  onLoad={() => onLoad(index)}
-                />
-              </li>
-            );
-          })}
-      </ul>
+      <PhotoProvider>
+        <div className="grid grid-cols-6 grid-flow-row gap-3 p-4">
+          {gallery.map((item, index) => (
+            <PhotoView key={index} src={item}>
+              <div
+                className="aspect-square border border-white/20 rounded hover:scale-105 transition-all hover:bg-white/10 cursor-pointer bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${item})`,
+                  imageRendering: "pixelated",
+                }}
+              ></div>
+            </PhotoView>
+          ))}
+        </div>
+      </PhotoProvider>
     </>
   );
 }
+
 export default App;
