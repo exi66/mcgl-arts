@@ -1,9 +1,6 @@
 import Packery from "packery";
-import { useEffect } from "react";
 
 function App() {
-  var packeryObject = null;
-
   const gallery = Object.values(
     import.meta.glob("@arts/*.{png,jpg,jpeg,PNG,JPEG}", {
       eager: true,
@@ -11,28 +8,38 @@ function App() {
     })
   );
 
-  useEffect(() => {
-    initPackery();
-  });
-
   function initPackery() {
-    setTimeout(() => {
-      if (packeryObject) return;
-      packeryObject = new Packery("#gallery", {
-        itemSelector: "img",
-        gutter: 0,
-      });
-    }, 100);
+    const packeryObject = new Packery("#gallery", {
+      itemSelector: "li",
+      gutter: 0,
+    });
+    packeryObject.layout();
   }
+
+  const onLoad = (index) => {
+    if (index === gallery.length - 1) {
+      setTimeout(() => {
+        initPackery();
+      }, 100);
+    }
+  };
 
   return (
     <>
-      <div id="gallery">
+      <ul id="gallery" style={{ padding: 0, overflowX: "hidden" }}>
         {gallery &&
           gallery.map((image, index) => {
-            return <img key={index} src={image} alt={`image №${index}`} />;
+            return (
+              <li key={index} style={{ listStyle: "none", lineHeight: 0 }}>
+                <img
+                  src={image}
+                  alt={`image №${index}`}
+                  onLoad={() => onLoad(index)}
+                />
+              </li>
+            );
           })}
-      </div>
+      </ul>
     </>
   );
 }
