@@ -1,9 +1,9 @@
 import Packery from "packery";
 import { useEffect } from "react";
 
-var packeryObject = null;
-
 function App() {
+  var packeryObject = null;
+
   const gallery = Object.values(
     import.meta.glob("@arts/*.{png,jpg,jpeg,PNG,JPEG}", {
       eager: true,
@@ -12,13 +12,18 @@ function App() {
   );
 
   useEffect(() => {
-    if (!packeryObject) {
+    initPackery();
+  });
+
+  function initPackery() {
+    setTimeout(() => {
+      if (packeryObject) return;
       packeryObject = new Packery("#gallery", {
         itemSelector: "img",
         gutter: 0,
       });
-    }
-  });
+    }, 100);
+  }
 
   return (
     <>
@@ -31,5 +36,4 @@ function App() {
     </>
   );
 }
-
 export default App;
