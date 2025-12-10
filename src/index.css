@@ -17,7 +17,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-img.PhotoView__Photo {
+.viewer-canvas > img {
   image-rendering: pixelated;
-  @apply bg-white/10;
+  background-color: #242424;
+}
+
+.viewer-player > img {
+  image-rendering: pixelated;
+  background-color: #242424;
+}
+
+.viewer-backdrop {
+  @apply !bg-black/80 backdrop-blur-sm;
 }
