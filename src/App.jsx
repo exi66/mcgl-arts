@@ -23,7 +23,7 @@ function App() {
       scalable: false,
       rotatable: false,
       zoomRatio: 0.33,
-      initialCoverage: 2,
+      initialCoverage: 0.9,
       title: [
         4,
         (image, imageData) =>
