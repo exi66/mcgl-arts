@@ -46,8 +46,8 @@ function App() {
     const filename = image.replace(/^.*[\\/]/, "").replace(/\.[^/.]+$/, "");
     return {
       src: image,
-      name: filename.split(".")[0],
-      author: filename.split(".")[1] || null,
+      name: decodeURI(filename.split(".")[0]),
+      author: decodeURI(filename.split(".")[1]) || null,
     };
   });
 
