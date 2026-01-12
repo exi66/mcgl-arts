@@ -13,21 +13,15 @@ function App() {
 
     if (!viewer || !viewer.isShown) return;
     switch (keyCode) {
-      case 27: // Escape
+      case 27:
         viewer.hide();
         break;
       case 38:
-        // Prevent scroll on Firefox
         event.preventDefault();
-
-        // Zoom in
         viewer.zoom(viewer.options.zoomRatio, true);
         break;
       case 40:
-        // Prevent scroll on Firefox
         event.preventDefault();
-
-        // Zoom out
         viewer.zoom(-viewer.options.zoomRatio, true);
         break;
     }
@@ -41,18 +35,21 @@ function App() {
   }, []);
 
   const images = Object.values(
-    import.meta.glob("@artworks/*/*.{png,jpg,jpeg,PNG,JPEG}", {
+    import.meta.glob("@artworks/*.{png,jpg,jpeg,PNG,JPEG}", {
       eager: true,
       query: "?url",
       import: "default",
     })
   );
 
-  const gallery = images.map((image) => ({
-    src: image,
-    name: image.replace(/^.*[\\/]/, "").replace(/\.[^/.]+$/, ""),
-    author: image.split("/")[5] === "default" ? null : image.split("/")[5],
-  }));
+  const gallery = images.map((image) => {
+    const filename = image.replace(/^.*[\\/]/, "").replace(/\.[^/.]+$/, "");
+    return {
+      src: image,
+      name: filename.split(".")[0],
+      author: filename.split(".")[1] || null,
+    };
+  });
 
   function createViewerInstance() {
     if (viewer) {
