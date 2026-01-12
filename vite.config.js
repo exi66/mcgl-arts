@@ -1,12 +1,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import * as path from "path";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
+import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -22,8 +21,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      "@arts": path.resolve(__dirname, "src/assets/arts"),
+      "@": path.resolve(__dirname, "./src"),
+      "@artworks": path.resolve(__dirname, "./src/assets/artworks"),
     },
   },
 });
