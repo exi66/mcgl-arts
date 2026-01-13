@@ -128,7 +128,7 @@ const App = () => {
 
   return (
     <>
-      <div className="max-w-266 p-4 mx-auto space-y-2">
+      <div className="max-w-270 p-4 mx-auto space-y-2">
         <header className="flex flex-row justify-between items-center">
           <h1 className="hidden sm:flex text-2xl font-bold items-center">
             <img src="favicon.svg" className="inline-block mr-2 w-8" />
