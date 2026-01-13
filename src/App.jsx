@@ -89,8 +89,10 @@ const App = () => {
     } else {
       params.delete("q");
     }
-    const newRelativePathQuery =
-      window.location.pathname + "?" + params.toString();
+    const queryString = params.toString();
+    const newRelativePathQuery = queryString
+      ? `${window.location.pathname}?${queryString}`
+      : window.location.pathname;
     window.history.replaceState(null, "", newRelativePathQuery);
   }, [search]);
 
