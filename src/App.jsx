@@ -137,6 +137,7 @@ const App = () => {
           <div className="relative grow sm:max-w-64">
             <Search className="absolute top-1/2 left-2 -translate-y-1/2 w-4 h-4" />
             <Input
+              id="search"
               type="text"
               placeholder="Поиск по названию или автору"
               className="ps-8"
