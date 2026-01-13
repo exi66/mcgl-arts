@@ -54,10 +54,28 @@ const App = () => {
   const gallery = initialGallery.filter((e) => {
     if (!search || search.trim() == "") return true;
     const query = search.toLocaleLowerCase();
-    return (
-      (e.author && e.author.toLocaleLowerCase().includes(query)) ||
-      e.name.toLocaleLowerCase().includes(query)
-    );
+    const regex = /(?:\s|^)([a-zA-Z]+):([^\s"']+|"[^"]*"|'[^']*')/g;
+    const operators = {};
+    let match;
+    while ((match = regex.exec(query)) !== null) {
+      operators[match[1]] = match[2].replace(/['"]/g, "");
+    }
+    const searchTerm = query.replace(regex, "").trim().replace(/\s+/g, " ");
+
+    if (Object.keys(operators).length > 0) {
+      for (const [key, value] of Object.entries(operators)) {
+        if (!e[key]) return false;
+        if (!e[key].toLocaleLowerCase().includes(value)) return false;
+      }
+      return searchTerm
+        ? e.name.toLocaleLowerCase().includes(searchTerm)
+        : true;
+    } else {
+      return (
+        (e.author && e.author.toLocaleLowerCase().includes(searchTerm)) ||
+        e.name.toLocaleLowerCase().includes(searchTerm)
+      );
+    }
   });
 
   useEffect(() => {
