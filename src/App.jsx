@@ -1,48 +1,35 @@
 import Viewer from "viewerjs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { patchViewer, useWindowDimensions } from "@/lib/utils";
-import { Masonry } from "masonic";
+import { Input } from "@/components/ui/input";
 
 let viewer = null;
 
-function App() {
-  const { width, height } = useWindowDimensions();
-
-  const handleDocumentKeyDown = (event) => {
-    const keyCode = event.keyCode || event.which || event.charCode;
-
-    if (!viewer || !viewer.isShown) return;
-    switch (keyCode) {
-      case 27:
-        viewer.hide();
-        break;
-      case 38:
-        event.preventDefault();
-        viewer.zoom(viewer.options.zoomRatio, true);
-        break;
-      case 40:
-        event.preventDefault();
-        viewer.zoom(-viewer.options.zoomRatio, true);
-        break;
-    }
-  };
-
+const useCtrlF = (onTrigger) => {
   useEffect(() => {
-    document.addEventListener("keydown", handleDocumentKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleDocumentKeyDown);
+    const handleKeyDown = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.code === "KeyF") {
+        event.preventDefault();
+        onTrigger();
+      }
     };
-  }, []);
 
-  const images = Object.values(
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onTrigger]);
+};
+
+const getGallery = () => {
+  return Object.values(
     import.meta.glob("@artworks/*.{png,jpg,jpeg,PNG,JPEG}", {
       eager: true,
       query: "?url",
       import: "default",
     })
-  );
-
-  const gallery = images.map((image) => {
+  ).map((image) => {
     const filename = image.replace(/^.*[\\/]/, "").replace(/\.[^/.]+$/, "");
     return {
       src: image,
@@ -50,8 +37,30 @@ function App() {
       author: decodeURI(filename.split(".")[1]) || null,
     };
   });
+};
 
-  function createViewerInstance() {
+const initialGallery = getGallery();
+
+const App = () => {
+  const [search, setSearch] = useState("");
+  const searchInputRef = useRef(null);
+  const focusSearchInput = () => {
+    searchInputRef.current?.focus();
+  };
+  useCtrlF(focusSearchInput);
+
+  const { width, height } = useWindowDimensions();
+
+  const gallery = initialGallery.filter((e) => {
+    if (!search || search.trim() == "") return true;
+    const query = search.toLocaleLowerCase();
+    return (
+      (e.author && e.author.toLocaleLowerCase().includes(query)) ||
+      e.name.toLocaleLowerCase().includes(query)
+    );
+  });
+
+  useEffect(() => {
     if (viewer) {
       viewer.destroy();
     }
@@ -62,21 +71,11 @@ function App() {
       zoomRatio: 0.33,
       initialCoverage: 0.9,
       fullscreen: false,
-      navbar: false,
-      toolbar: {
-        zoomIn: 4,
-        zoomOut: 4,
-        oneToOne: 4,
-      },
-      keyboard: false,
-      slideOnTouch: false,
+      toolbar: 4,
       title: [
         true,
         (image, imageData) => {
-          const index = parseInt(
-            viewer.images[viewer.index].id.replace("artwork-", "")
-          );
-          const { name, author } = gallery[index];
+          const { name, author } = gallery[viewer.index];
           const canvasWidth = Math.floor(imageData.naturalWidth / 64);
           const canvasHeight = Math.floor(imageData.naturalHeight / 64);
           const desc = [
@@ -91,34 +90,39 @@ function App() {
       imageMinHeight: Math.min(width - 32, height - 96, 768),
     });
     patchViewer(viewer);
-  }
+  }, [width, height, gallery]);
 
   return (
     <>
-      <main className="max-w-6xl px-4 py-4 mx-auto">
-        <div className="flex flex-col gap-4 mb-4">
-          <div className="border-b ">
-            <h1 className="text-3xl font-bold text-center mb-4 flex items-center justify-center gap-1">
-              <img src="favicon.svg" className="inline-block mr-2 w-8" />
-              Архив картин MCGL
-            </h1>
-          </div>
-        </div>
-        <Masonry
-          tabIndex={-1}
-          className="outline-none"
-          id="artworks-container"
-          onRender={createViewerInstance}
-          items={gallery}
-          columnGutter={32}
-          columnWidth={256}
-          overscanBy={4}
-          render={Card}
-        />
-      </main>
+      <div className="max-w-266 p-4 mx-auto space-y-2">
+        <header className="flex flex-row justify-between items-center">
+          <h1 className="hidden sm:flex text-2xl font-bold items-center">
+            <img src="favicon.svg" className="inline-block mr-2 w-8" />
+            <span>Архив картин MCGL</span>
+          </h1>
+          <Input
+            type="text"
+            placeholder="Поиск по названию или автору..."
+            className="grow sm:max-w-64"
+            ref={searchInputRef}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </header>
+        <div className="border-b w-full h-px"></div>
+        <main>
+          <ul
+            id="artworks-container"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 grid-flow-row gap-2 mx-auto list-none"
+          >
+            {gallery.map((item, index) => (
+              <Card key={index} index={index} data={item} />
+            ))}
+          </ul>
+        </main>
+      </div>
     </>
   );
-}
+};
 
 const Card = ({ index, data: { src, name, author } }) => {
   const [scaleRate, setscaleRate] = useState({ width: 1, height: 1 });
@@ -126,35 +130,28 @@ const Card = ({ index, data: { src, name, author } }) => {
 
   function openViewer() {
     if (viewer) {
-      const images = viewer.images;
-      const __index = images?.findIndex((img) => img.id === "artwork-" + index);
-      if (__index && __index !== -1) {
-        viewer.view(__index);
-      } else {
-        console.warn("Image not found in viewer:", "artwork-" + index);
-      }
+      viewer.view(index);
     }
   }
 
   return (
     <>
-      <div
-        className="rounded cursor-pointer relative group"
+      <li
+        className="aspect-square bg-muted cursor-pointer relative group"
         onClick={() => openViewer()}
       >
-        <div className="bg-linear-to-t from-background to-transparent w-full h-full transition-all duration-100 absolute top-0 left-0 rounded group-hover:opacity-100 opacity-0 flex items-end justify-start p-2">
-          <div className="flex flex-col">
-            <span className="font-semibold">{name}</span>
-            {author && <span className="font-semibold">by {author}</span>}
-            <span>
+        <div className="bg-linear-to-t from-background to-transparent w-full h-full transition-all absolute top-0 left-0 rounded group-hover:opacity-100 opacity-0 flex flex-col justify-end">
+          <div className="p-2">
+            <p className="font-semibold">{name}</p>
+            {author && <p className="font-semibold">by {author}</p>}
+            <p>
               {dimensions.width} × {dimensions.height} (
               {Math.floor(dimensions.width / 64)} ×{" "}
               {Math.floor(dimensions.height / 64)})
-            </span>
+            </p>
           </div>
         </div>
         <img
-          id={`artwork-${index}`}
           onLoad={(e) => {
             const { naturalWidth, naturalHeight } = e.target;
             const { width, height } = e.target;
@@ -164,7 +161,7 @@ const Card = ({ index, data: { src, name, author } }) => {
               height: height / naturalHeight,
             });
           }}
-          className="w-full h-auto rounded min-w-64 bg-muted"
+          className="h-full w-full object-cover bg-muted"
           src={src}
           alt={name}
           style={{
@@ -174,7 +171,7 @@ const Card = ({ index, data: { src, name, author } }) => {
                 : "auto",
           }}
         />
-      </div>
+      </li>
     </>
   );
 };
