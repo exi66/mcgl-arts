@@ -25,7 +25,7 @@ const useCtrlF = (onTrigger) => {
 
 const getGallery = () => {
   return Object.values(
-    import.meta.glob("@artworks/*.{png,jpg,jpeg,PNG,JPEG}", {
+    import.meta.glob("@artworks/*/*.{png,jpg,jpeg,PNG,JPEG}", {
       eager: true,
       query: "?url",
       import: "default",
