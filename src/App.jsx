@@ -2,6 +2,7 @@ import Viewer from "viewerjs";
 import { useState, useEffect, useRef } from "react";
 import { patchViewer, useWindowDimensions } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 let viewer = null;
 
@@ -42,7 +43,10 @@ const getGallery = () => {
 const initialGallery = getGallery();
 
 const App = () => {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("q") || "";
+  });
   const searchInputRef = useRef(null);
   const focusSearchInput = () => {
     searchInputRef.current?.focus();
@@ -77,6 +81,18 @@ const App = () => {
       );
     }
   });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (search) {
+      params.set("q", search);
+    } else {
+      params.delete("q");
+    }
+    const newRelativePathQuery =
+      window.location.pathname + "?" + params.toString();
+    window.history.replaceState(null, "", newRelativePathQuery);
+  }, [search]);
 
   useEffect(() => {
     if (viewer) {
@@ -118,13 +134,17 @@ const App = () => {
             <img src="favicon.svg" className="inline-block mr-2 w-8" />
             <span>Архив картин MCGL</span>
           </h1>
-          <Input
-            type="text"
-            placeholder="Поиск по названию или автору..."
-            className="grow sm:max-w-64"
-            ref={searchInputRef}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <div className="relative grow sm:max-w-64">
+            <Search className="absolute top-1/2 left-2 -translate-y-1/2 w-4 h-4" />
+            <Input
+              type="text"
+              placeholder="Поиск по названию или автору"
+              className="ps-8"
+              ref={searchInputRef}
+              onChange={(e) => setSearch(e.target.value)}
+              value={search}
+            />
+          </div>
         </header>
         <div className="border-b w-full h-px"></div>
         <main>
