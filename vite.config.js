@@ -15,14 +15,20 @@ export default defineConfig({
     assetsInlineLimit: 0,
     rollupOptions: {
       output: {
-        assetFileNames: "[name].[ext]",
+        // Картинки сохраняют путь из src/assets (artworks/<Автор>/<Название>.png):
+        // их адреса используются на форуме и не должны меняться между сборками.
+        // Остальным ассетам (CSS) — хэш для сброса кэша.
+        assetFileNames: (info) => {
+          const source = info.originalFileNames?.[0] ?? "";
+          const artwork = source.match(/src\/assets\/(artworks\/.+)$/);
+          return artwork ? artwork[1] : "assets/[name]-[hash][extname]";
+        },
       },
     },
   },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@artworks": path.resolve(__dirname, "./src/assets/artworks"),
     },
   },
 });
