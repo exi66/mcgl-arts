@@ -1,0 +1,24 @@
+{
+  "app": {
+    "title": "Архив картин MCGL"
+  },
+  "search": {
+    "label": "Поиск",
+    "placeholder": "Поиск по названию или автору",
+    "empty": "Ничего не найдено"
+  },
+  "artwork": {
+    "open": "Открыть «{{name}}»",
+    "author": "автор: {{author}}",
+    "size": "{{width}} × {{height}} ({{blocksWidth}} × {{blocksHeight}})"
+  },
+  "viewer": {
+    "name": "Название: {{name}}",
+    "author": "Автор: {{author}}",
+    "size": "Размер: {{width}} × {{height}} ({{blocksWidth}} × {{blocksHeight}})"
+  },
+  "theme": {
+    "light": "Светлая тема",
+    "dark": "Тёмная тема"
+  }
+}
