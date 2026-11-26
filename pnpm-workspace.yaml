@@ -1,0 +1,3 @@
+overrides:
+  # minimatch < 11.0.1: DoS via globparts amplification (GHSA, pulled in by shadcn -> ts-morph). Drop when ts-morph updates.
+  minimatch@>=10.0.0 <11.0.1: ^11.0.1
